@@ -11,7 +11,7 @@ func main() {
 	var bestInd * es.Individual
 	bestValidation := 0.0
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 10; i++ {
 		population := es.NewPopulation(1, 1, 100000, "../datasets/sun.txt")
 		ioHandler := iohandlers.GetInstance()
 		indRun, valueTraining := population.Run()

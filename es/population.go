@@ -15,6 +15,7 @@ type Population struct {
 	iteration     int
 	maxIterations int
 	fitness       map[*Individual]float64
+	lastFitnessValidation float64
 }
 
 func (population *Population) Len() int { return len(population.pop) }
@@ -58,19 +59,30 @@ func (population *Population) f(individual *Individual) float64 {
 }
 
 func (population *Population) hasReachedLimit() bool {
-	return population.iteration > population.maxIterations
+	bestInd := population.pop[0]
+	ioHandler := iohandlers.GetInstance()
+	in, out := ioHandler.GetKLagValidationSet(bestInd.GetLag())
+	fitnessValidation := bestInd.Fitness(in, out)
+	rateDeacrease := fitnessValidation/population.lastFitnessValidation
+
+	hasReachedEnd := population.iteration > population.maxIterations ||
+	(population.iteration > 1 && rateDeacrease <= 0.99)
+
+	population.lastFitnessValidation = fitnessValidation
+	return hasReachedEnd
 }
 
 // Run ...
 func (population *Population) Run() (*Individual, float64) {
 	population.initPop()
-	population.iteration = 1
+	population.iteration = 0
 	//var bestInd * Individual
 
-	for !population.hasReachedLimit() {
+	for {
 		sort.Sort(population)
 		population.parentReplacement()
 		population.iteration++
+		if !population.hasReachedLimit() { break }
 	}
 	sort.Sort(population)
 
@@ -97,6 +109,7 @@ func NewPopulation(mu, lambda, maxInterations int, datasetPath string) *Populati
 		lambda:        lambda,
 		maxIterations: maxInterations}
 	population.fitness = make(map[*Individual]float64)
+	population.lastFitnessValidation = -1.0
 
 	return population
 }
