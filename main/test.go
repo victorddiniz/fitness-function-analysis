@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/victorddiniz/fitness_function_analysis/functions"
+	"github.com/victorddiniz/fitness-function-analysis/functions"
 	"fmt"
-	"github.com/victorddiniz/fitness_function_analysis/iohandlers"
-	"github.com/victorddiniz/fitness_function_analysis/es"
+	"github.com/victorddiniz/fitness-function-analysis/iohandlers"
+	"github.com/victorddiniz/fitness-function-analysis/es"
 )
 
 func main() {

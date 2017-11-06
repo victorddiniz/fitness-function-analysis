@@ -4,7 +4,7 @@ import (
 	"sort"
 	"math/rand"
 	"time"
-	"github.com/victorddiniz/fitness_function_analysis/iohandlers"
+	"github.com/victorddiniz/fitness-function-analysis/iohandlers"
 )
 
 // Population ...

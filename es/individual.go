@@ -2,7 +2,7 @@ package es
 
 import (
 	"time"
-	"github.com/victorddiniz/fitness_function_analysis/functions"
+	"github.com/victorddiniz/fitness-function-analysis/functions"
 	"math"
 	"math/rand"
 )
