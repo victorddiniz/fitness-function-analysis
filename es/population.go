@@ -3,7 +3,6 @@ package es
 import (
 	"sort"
 	"math/rand"
-	"time"
 	"github.com/victorddiniz/fitness-function-analysis/iohandlers"
 )
 
@@ -90,15 +89,13 @@ func (population *Population) Run() (*Individual, float64) {
 }
 
 // NewPopulation ...
-func NewPopulation(mu, lambda, maxInterations int, datasetPath string) *Population {
+func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen * rand.Rand) *Population {
 	pop := make([]*Individual, mu)
-	seed := rand.NewSource(time.Now().UnixNano())
-	randSource := rand.New(seed)
 
 	for index := range pop {
-		lag := randSource.Intn(10) + 1
-		hidden := randSource.Intn(10) + 1
-		pop[index] = NewIndividual(lag, hidden)
+		lag := randGen.Intn(10) + 1
+		hidden := randGen.Intn(10) + 1
+		pop[index] = NewIndividual(lag, hidden, randGen)
 	}
 
 	iohandlers.NewIOHandler(datasetPath, 10)

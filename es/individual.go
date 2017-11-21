@@ -1,13 +1,10 @@
 package es
 
 import (
-	"time"
 	"github.com/victorddiniz/fitness-function-analysis/functions"
 	"math"
 	"math/rand"
 )
-
-var randSource *rand.Rand
 
 // Individual ...
 type Individual struct {
@@ -17,6 +14,7 @@ type Individual struct {
 	tLine float64
 	hidden int
 	lag int
+	randGen *rand.Rand
 }
 
 func (ind *Individual) epsilon() float64 {
@@ -28,7 +26,7 @@ func (ind *Individual) mutateMS(i, j int) {
 	t := ind.t
 	tLine := ind.tLine
 
-	ms *= math.Exp(tLine * randSource.NormFloat64() + t * randSource.NormFloat64())
+	ms *= math.Exp(tLine * ind.randGen.NormFloat64() + t * ind.randGen.NormFloat64())
 	if ms < ind.epsilon() {
 		ms = ind.epsilon()
 	}
@@ -39,7 +37,7 @@ func (ind *Individual) mutateWeight(i, j int) {
 	ms := ind.mSteps[i][j]
 	weight := ind.weights[i][j]
 
-	ind.weights[i][j] = weight + ms * randSource.NormFloat64()
+	ind.weights[i][j] = weight + ms * ind.randGen.NormFloat64()
 }
 
 func (ind *Individual) predictSolo(input []float64) float64 {
@@ -64,6 +62,7 @@ func (ind *Individual) copy() *Individual {
 	copy(newInd.mSteps, ind.mSteps)
 	newInd.t, newInd.tLine = ind.t, ind.tLine
 	newInd.hidden, newInd.lag = ind.hidden, ind.lag
+	newInd.randGen = ind.randGen
 	return &newInd
 }
 
@@ -110,22 +109,20 @@ func (ind Individual) Mutate() *Individual{
 }
 
 // NewIndividual ...
-func NewIndividual(lag, hidden int) (*Individual) {
+func NewIndividual(lag, hidden int, randGen * rand.Rand) (*Individual) {
 	weights := make([][]float64, lag + 1)
 	mSteps := make([][]float64, lag + 1)
 	wTotal := float64(lag * hidden)
 	t := 1.0/(math.Sqrt(2.0 * math.Sqrt(wTotal)))
 	tLine := 1.0/(math.Sqrt(2.0 * wTotal))
-	seed := rand.NewSource(time.Now().UnixNano())
-	randSource = rand.New(seed)
 
 	for i := 0; i <= lag; i++ {
 		weights[i] = make([]float64, hidden)
 		mSteps[i] = make([]float64, hidden)
 		for j := 0; j < hidden; j++ {
-			weights[i][j] = math.Max(randSource.NormFloat64() * 0.5/3.0 + 0.5, 0.0)
+			weights[i][j] = math.Max(randGen.NormFloat64() * 0.5/3.0 + 0.5, 0.0)
 			weights[i][j] = math.Min(weights[i][j], 1.0)
-			mSteps[i][j] = randSource.Float64()
+			mSteps[i][j] = randGen.Float64()
 		}
 	}
 
@@ -135,5 +132,6 @@ func NewIndividual(lag, hidden int) (*Individual) {
 		t:t,
 		tLine: tLine,
 		hidden: hidden,
-		lag: lag}
+		lag: lag,
+		randGen: randGen}
 }
