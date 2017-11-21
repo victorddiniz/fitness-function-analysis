@@ -72,7 +72,7 @@ func (population *Population) hasReachedLimit() bool {
 }
 
 // Run ...
-func (population *Population) Run() (*Individual, float64) {
+func (population *Population) Run() (*Individual, float64, int) {
 	population.initPop()
 	population.iteration = 0
 	//var bestInd * Individual
@@ -81,11 +81,11 @@ func (population *Population) Run() (*Individual, float64) {
 		sort.Sort(population)
 		population.parentReplacement()
 		population.iteration++
-		if !population.hasReachedLimit() { break }
+		if population.hasReachedLimit() { break }
 	}
 	sort.Sort(population)
 
-	return population.pop[0], population.f(population.pop[0])
+	return population.pop[0], population.f(population.pop[0]), population.iteration
 }
 
 // NewPopulation ...

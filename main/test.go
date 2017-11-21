@@ -16,7 +16,7 @@ func main() {
 	for i := 0; i < 10; i++ {
 		population := es.NewPopulation(1, 1, 100000, "../datasets/sun.txt", rand)
 		ioHandler := iohandlers.GetInstance()
-		indRun, valueTraining := population.Run()
+		indRun, valueTraining, numIter := population.Run()
 		in, out := ioHandler.GetKLagValidationSet(indRun.GetLag())
 		value := indRun.Fitness(in, out)
 
@@ -24,7 +24,7 @@ func main() {
 			bestInd = indRun
 			bestValidation = value
 		}
-		fmt.Println(value, valueTraining)
+		fmt.Println(value, valueTraining, numIter)
 	}
 
 	ioHandler := iohandlers.GetInstance()
