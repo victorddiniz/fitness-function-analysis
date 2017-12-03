@@ -10,6 +10,8 @@ import (
 type Individual struct {
 	weights [][]float64
 	mSteps [][]float64
+	biasWeights []float64
+	biasMSteps []float64
 	t float64
 	tLine float64
 	hidden int
@@ -22,7 +24,14 @@ func (ind *Individual) epsilon() float64 {
 }
 
 func (ind *Individual) mutateMS(i, j int) {
-	ms := ind.mSteps[i][j]
+	var ms float64
+
+	if j == -1 {
+		ms = ind.biasMSteps[i]
+	} else {
+		ms = ind.mSteps[i][j]
+	}
+
 	t := ind.t
 	tLine := ind.tLine
 
@@ -30,14 +39,26 @@ func (ind *Individual) mutateMS(i, j int) {
 	if ms < ind.epsilon() {
 		ms = ind.epsilon()
 	}
-	ind.mSteps[i][j] = ms
+
+	if j == -1 {
+		ind.biasMSteps[i] = ms
+	} else {
+		ind.mSteps[i][j] = ms
+	}
 }
 
 func (ind *Individual) mutateWeight(i, j int) {
-	ms := ind.mSteps[i][j]
-	weight := ind.weights[i][j]
+	var ms, weight float64
 
-	ind.weights[i][j] = weight + ms * ind.randGen.NormFloat64()
+	if j == -1 {
+		ms = ind.biasMSteps[i]
+		weight = ind.biasWeights[i]
+		ind.biasWeights[i] = weight + ms * ind.randGen.NormFloat64()
+	} else {
+		ms = ind.mSteps[i][j]
+		weight = ind.weights[i][j]
+		ind.weights[i][j] = weight + ms * ind.randGen.NormFloat64()
+	}
 }
 
 func (ind *Individual) predictSolo(input []float64) float64 {
@@ -58,8 +79,12 @@ func (ind *Individual) copy() *Individual {
 	var newInd Individual
 	newInd.weights = make([][]float64, len(ind.weights))
 	newInd.mSteps = make([][]float64, len(ind.mSteps))
+	newInd.biasMSteps = make([]float64, len(ind.biasMSteps))
+	newInd.biasWeights = make([]float64, len(ind.biasWeights))
 	copy(newInd.weights, ind.weights)
 	copy(newInd.mSteps, ind.mSteps)
+	copy(newInd.biasMSteps, ind.biasMSteps)
+	copy(newInd.biasWeights, ind.biasWeights)
 	newInd.t, newInd.tLine = ind.t, ind.tLine
 	newInd.hidden, newInd.lag = ind.hidden, ind.lag
 	newInd.randGen = ind.randGen
@@ -105,6 +130,12 @@ func (ind Individual) Mutate() *Individual{
 			newInd.mutateWeight(i, j)
 		}
 	}
+
+	for i := 0; i <= newInd.hidden; i++ {
+		newInd.mutateMS(i, -1)
+		newInd.mutateWeight(i, -1)
+	}
+
 	return newInd
 }
 
@@ -112,6 +143,8 @@ func (ind Individual) Mutate() *Individual{
 func NewIndividual(lag, hidden int, randGen * rand.Rand) (*Individual) {
 	weights := make([][]float64, lag + 1)
 	mSteps := make([][]float64, lag + 1)
+	biasWeights := make([]float64, hidden + 1)
+	biasMSteps := make([]float64, hidden + 1)
 	wTotal := float64(lag * hidden)
 	t := 1.0/(math.Sqrt(2.0 * math.Sqrt(wTotal)))
 	tLine := 1.0/(math.Sqrt(2.0 * wTotal))
@@ -125,10 +158,17 @@ func NewIndividual(lag, hidden int, randGen * rand.Rand) (*Individual) {
 			mSteps[i][j] = randGen.Float64()
 		}
 	}
+	for j := 0; j <= hidden; j++ {
+		biasWeights[j] = math.Max(randGen.NormFloat64() * 0.5/3.0 + 0.5, 0.0)
+		biasWeights[j] = math.Min(biasWeights[j], 1.0)
+		biasMSteps[j] = randGen.Float64()
+	}
 
 	return &Individual{
 		weights: weights,
 		mSteps: mSteps,
+		biasWeights: biasWeights,
+		biasMSteps: biasMSteps,
 		t:t,
 		tLine: tLine,
 		hidden: hidden,
