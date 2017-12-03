@@ -64,14 +64,14 @@ func (ind *Individual) mutateWeight(i, j int) {
 func (ind *Individual) predictSolo(input []float64) float64 {
 	intermediarySumSig := 0.0
 	for i := 0; i < ind.hidden; i++ {
-		partial := 0.0
+		partial := -ind.biasWeights[i] * float64(ind.hidden)
 		for j := 0; j < ind.lag; j++ {
 			partial += ind.weights[j][i] * input[j]
 		}
 		partial = functions.Sigmoid(partial)
 		intermediarySumSig += partial * ind.weights[ind.lag][i]
 	}
-	return functions.Sigmoid(intermediarySumSig)
+	return intermediarySumSig - ind.biasWeights[ind.hidden]
 
 }
 
