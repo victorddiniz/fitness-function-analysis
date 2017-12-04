@@ -77,13 +77,13 @@ func (population *Population) Run() (*Individual, float64, int) {
 	population.iteration = 0
 	//var bestInd * Individual
 
+	sort.Sort(population)
 	for {
-		sort.Sort(population)
 		population.parentReplacement()
 		population.iteration++
+		sort.Sort(population)
 		if population.hasReachedLimit() { break }
 	}
-	sort.Sort(population)
 
 	return population.pop[0], population.f(population.pop[0]), population.iteration
 }
