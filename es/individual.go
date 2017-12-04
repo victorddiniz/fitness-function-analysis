@@ -81,8 +81,12 @@ func (ind *Individual) copy() *Individual {
 	newInd.mSteps = make([][]float64, len(ind.mSteps))
 	newInd.biasMSteps = make([]float64, len(ind.biasMSteps))
 	newInd.biasWeights = make([]float64, len(ind.biasWeights))
-	copy(newInd.weights, ind.weights)
-	copy(newInd.mSteps, ind.mSteps)
+	for i := 0; i <= ind.lag; i++ {
+		newInd.weights[i] = make([]float64, ind.hidden)
+		newInd.mSteps[i] = make([]float64, ind.hidden)
+		copy(newInd.weights[i], ind.weights[i])
+		copy(newInd.mSteps[i], ind.mSteps[i])
+	}
 	copy(newInd.biasMSteps, ind.biasMSteps)
 	copy(newInd.biasWeights, ind.biasWeights)
 	newInd.t, newInd.tLine = ind.t, ind.tLine
@@ -122,7 +126,7 @@ func (ind *Individual) Predict(input [][]float64) []float64 {
 }
 
 // Mutate ...
-func (ind Individual) Mutate() *Individual{
+func (ind *Individual) Mutate() *Individual{
 	newInd := ind.copy()
 	for i := 0; i <= newInd.lag; i++ {
 		for j := 0; j < newInd.hidden; j++ {
