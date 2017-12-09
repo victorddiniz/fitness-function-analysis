@@ -89,7 +89,7 @@ func (population *Population) Run() (*Individual, float64, int) {
 }
 
 // NewPopulation ...
-func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen * rand.Rand) *Population {
+func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen * rand.Rand, fitFunction func(t, o []float64) float64) *Population {
 	pop := make([]*Individual, mu)
 	maxLag := 20
 	maxHidden := 30
@@ -97,7 +97,7 @@ func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen *
 	for index := range pop {
 		lag := randGen.Intn(maxLag) + 1
 		hidden := randGen.Intn(maxHidden) + 1
-		pop[index] = NewIndividual(lag, hidden, randGen)
+		pop[index] = NewIndividual(lag, hidden, randGen, fitFunction)
 	}
 
 	iohandlers.NewIOHandler(datasetPath, maxLag)

@@ -16,6 +16,7 @@ type Individual struct {
 	tLine float64
 	hidden int
 	lag int
+	fitnessFunction func(t, o []float64) float64
 	randGen *rand.Rand
 }
 
@@ -113,7 +114,7 @@ func (ind *Individual) GetLag() int {
 // Fitness ...
 func (ind *Individual) Fitness(input [][]float64, target []float64) float64 {
 	output := ind.Predict(input)
-	return 1.0/(1.0 + functions.MSE(target, output))
+	return ind.fitnessFunction(target, output)
 }
 
 // Predict ...
@@ -144,7 +145,7 @@ func (ind *Individual) Mutate() *Individual{
 }
 
 // NewIndividual ...
-func NewIndividual(lag, hidden int, randGen * rand.Rand) (*Individual) {
+func NewIndividual(lag, hidden int, randGen * rand.Rand, fitFunc func(t, o []float64) float64) (*Individual) {
 	weights := make([][]float64, lag + 1)
 	mSteps := make([][]float64, lag + 1)
 	biasWeights := make([]float64, hidden + 1)
@@ -177,5 +178,7 @@ func NewIndividual(lag, hidden int, randGen * rand.Rand) (*Individual) {
 		tLine: tLine,
 		hidden: hidden,
 		lag: lag,
-		randGen: randGen}
+		randGen: randGen,
+		fitnessFunction: fitFunc,
+	}
 }
