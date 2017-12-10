@@ -90,6 +90,7 @@ func (ind *Individual) copy() *Individual {
 	}
 	copy(newInd.biasMSteps, ind.biasMSteps)
 	copy(newInd.biasWeights, ind.biasWeights)
+	newInd.fitnessFunction = ind.fitnessFunction
 	newInd.t, newInd.tLine = ind.t, ind.tLine
 	newInd.hidden, newInd.lag = ind.hidden, ind.lag
 	newInd.randGen = ind.randGen
