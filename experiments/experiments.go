@@ -20,8 +20,9 @@ type Experiment struct {
 }
 
 // Run ...
-func (e *Experiment) Run() [][]float64{
+func (e *Experiment) Run() ([][]float64, [][]float64){
 	results := make([][]float64, len(e.fitFunctions))
+	predictions := make([][]float64, len(e.fitFunctions))
 
 	for i, fitFunc := range e.fitFunctions {
 		results[i] = make([]float64, len(e.errorMeasures))
@@ -45,13 +46,14 @@ func (e *Experiment) Run() [][]float64{
 		ioHandler := iohandlers.GetInstance()
 		in, target := ioHandler.GetKLagTestSet(bestInd.GetLag())
 		obs := bestInd.Predict(in)
+		predictions[i] = obs
 
 		for j, errorFunc := range e.errorMeasures {
 			results[i][j] = errorFunc(target, obs)
 		}
 	}
 
-	return results
+	return results, predictions
 }
 
 // NewExperiment ...

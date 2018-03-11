@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	experiment := experiments.NewExperiment(time.Now().UnixNano(), 10, 1, 1, 100000, "datasets/dj.txt")
-	results := experiment.Run()
+	experiment := experiments.NewExperiment(time.Now().UnixNano(), 10, 1, 1, 100000, "datasets/star.txt")
+	results, _ := experiment.Run()
 	
 	for _, fitValues := range results {
 		stringResults := make([]string, len(fitValues))
