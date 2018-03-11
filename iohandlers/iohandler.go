@@ -113,7 +113,7 @@ func NewIOHandler(path string, maxLag int) *IOHandler {
 			}
 		}
 		for index, value := range rawData {
-			rawData[index] = (value - minVal) / (maxVal - minVal)
+			rawData[index] = ((value - minVal) / (maxVal - minVal)) + 1.0
 		}
 
 		trainingSet, validationSet, testSet := splitInSets(rawData)
