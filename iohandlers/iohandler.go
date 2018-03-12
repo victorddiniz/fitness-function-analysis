@@ -46,7 +46,6 @@ func (ioHandler *IOHandler) GetKLagTestSet(lagK int) ([][]float64, []float64) {
 	return splitIO(lagK, ioHandler.testSetByLag)
 }
 
-
 var instance *IOHandler
 
 func splitDataInKLag(rawData []float64, lag int) [][]float64 {

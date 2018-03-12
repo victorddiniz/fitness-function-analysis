@@ -1,26 +1,27 @@
 package experiments
 
 import (
-	"github.com/victorddiniz/fitness-function-analysis/iohandlers"
+	"math/rand"
+
 	"github.com/victorddiniz/fitness-function-analysis/es"
 	"github.com/victorddiniz/fitness-function-analysis/functions"
-	"math/rand"
+	"github.com/victorddiniz/fitness-function-analysis/iohandlers"
 )
 
 // Experiment ...
 type Experiment struct {
-	rand *rand.Rand
-	numTests int
-	mu int
-	lambda int
+	rand           *rand.Rand
+	numTests       int
+	mu             int
+	lambda         int
 	maxIteractions int
-	datasetPath string
-	fitFunctions []func(t, o []float64) float64
-	errorMeasures []func(t, o []float64) float64
+	datasetPath    string
+	fitFunctions   []func(t, o []float64) float64
+	errorMeasures  []func(t, o []float64) float64
 }
 
 // Run ...
-func (e *Experiment) Run() ([][]float64, [][]float64){
+func (e *Experiment) Run() ([][]float64, [][]float64) {
 	results := make([][]float64, len(e.fitFunctions))
 	predictions := make([][]float64, len(e.fitFunctions))
 
@@ -32,7 +33,7 @@ func (e *Experiment) Run() ([][]float64, [][]float64){
 		for j := 0; j < e.numTests; j++ {
 			population := es.NewPopulation(e.mu, e.lambda, e.maxIteractions, e.datasetPath, e.rand, fitFunc)
 			ioHandler := iohandlers.GetInstance()
-			
+
 			indRun, _, _ := population.Run()
 			in, out := ioHandler.GetKLagValidationSet(indRun.GetLag())
 			value := indRun.Fitness(in, out)
@@ -57,12 +58,12 @@ func (e *Experiment) Run() ([][]float64, [][]float64){
 }
 
 // NewExperiment ...
-func NewExperiment(randSeed int64, numTests, mu, lambda, maxIteractions int, datasetPath string) *Experiment{
+func NewExperiment(randSeed int64, numTests, mu, lambda, maxIteractions int, datasetPath string) *Experiment {
 	rand := rand.New(rand.NewSource(randSeed))
 
 	fitFunctions := []func(t, o []float64) float64{
 		functions.F1,
-		functions.F2,	
+		functions.F2,
 		functions.F3,
 		functions.F4,
 		functions.F5,
@@ -71,7 +72,7 @@ func NewExperiment(randSeed int64, numTests, mu, lambda, maxIteractions int, dat
 		functions.F8,
 	}
 
-	errorMeasures := []func(t, o []float64) float64 {
+	errorMeasures := []func(t, o []float64) float64{
 		functions.ARV,
 		functions.MAPE,
 		functions.MSE,
@@ -80,13 +81,13 @@ func NewExperiment(randSeed int64, numTests, mu, lambda, maxIteractions int, dat
 	}
 
 	return &Experiment{
-		rand: rand,
-		numTests: numTests,
-		mu: mu,
-		lambda: lambda,
+		rand:           rand,
+		numTests:       numTests,
+		mu:             mu,
+		lambda:         lambda,
 		maxIteractions: maxIteractions,
-		datasetPath: datasetPath,
-		fitFunctions: fitFunctions,
-		errorMeasures: errorMeasures,
+		datasetPath:    datasetPath,
+		fitFunctions:   fitFunctions,
+		errorMeasures:  errorMeasures,
 	}
 }

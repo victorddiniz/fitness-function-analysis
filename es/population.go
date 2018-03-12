@@ -1,19 +1,20 @@
 package es
 
 import (
-	"sort"
 	"math/rand"
+	"sort"
+
 	"github.com/victorddiniz/fitness-function-analysis/iohandlers"
 )
 
 // Population ...
 type Population struct {
-	pop           []*Individual
-	mu            int
-	lambda        int
-	iteration     int
-	maxIterations int
-	fitness       map[*Individual]float64
+	pop                   []*Individual
+	mu                    int
+	lambda                int
+	iteration             int
+	maxIterations         int
+	fitness               map[*Individual]float64
 	lastFitnessValidation float64
 }
 
@@ -62,10 +63,10 @@ func (population *Population) hasReachedLimit() bool {
 	ioHandler := iohandlers.GetInstance()
 	in, out := ioHandler.GetKLagValidationSet(bestInd.GetLag())
 	fitnessValidation := bestInd.Fitness(in, out)
-	rateDeacrease := fitnessValidation/population.lastFitnessValidation
+	rateDeacrease := fitnessValidation / population.lastFitnessValidation
 
 	hasReachedEnd := population.iteration > population.maxIterations ||
-	(population.iteration > 1 && rateDeacrease <= 0.99)
+		(population.iteration > 1 && rateDeacrease <= 0.99)
 
 	population.lastFitnessValidation = fitnessValidation
 	return hasReachedEnd
@@ -82,14 +83,16 @@ func (population *Population) Run() (*Individual, float64, int) {
 		population.parentReplacement()
 		population.iteration++
 		sort.Sort(population)
-		if population.hasReachedLimit() { break }
+		if population.hasReachedLimit() {
+			break
+		}
 	}
 
 	return population.pop[0], population.f(population.pop[0]), population.iteration
 }
 
 // NewPopulation ...
-func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen * rand.Rand, fitFunction func(t, o []float64) float64) *Population {
+func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen *rand.Rand, fitFunction func(t, o []float64) float64) *Population {
 	pop := make([]*Individual, mu)
 	maxLag := 20
 	maxHidden := 30
