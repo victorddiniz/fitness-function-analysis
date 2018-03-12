@@ -16,6 +16,7 @@ type Population struct {
 	maxIterations         int
 	fitness               map[*Individual]float64
 	lastFitnessValidation float64
+	ee                    *EvolutionExporter
 }
 
 func (population *Population) Len() int { return len(population.pop) }
@@ -69,6 +70,13 @@ func (population *Population) hasReachedLimit() bool {
 		(population.iteration > 1 && rateDeacrease <= 0.99)
 
 	population.lastFitnessValidation = fitnessValidation
+
+	if population.iteration%20 == 0 || population.iteration == 1 {
+		target := out
+		observations := bestInd.Predict(in)
+		population.ee.WriteEvolution(target, observations, fitnessValidation)
+	}
+
 	return hasReachedEnd
 }
 
@@ -88,11 +96,12 @@ func (population *Population) Run() (*Individual, float64, int) {
 		}
 	}
 
+	population.ee.Close()
 	return population.pop[0], population.f(population.pop[0]), population.iteration
 }
 
 // NewPopulation ...
-func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen *rand.Rand, fitFunction func(t, o []float64) float64) *Population {
+func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen *rand.Rand, fitFunction func(t, o []float64) float64, ee *EvolutionExporter) *Population {
 	pop := make([]*Individual, mu)
 	maxLag := 20
 	maxHidden := 30
@@ -106,12 +115,14 @@ func NewPopulation(mu, lambda, maxInterations int, datasetPath string, randGen *
 	iohandlers.NewIOHandler(datasetPath, maxLag)
 
 	population := &Population{
-		pop:           pop,
-		mu:            mu,
-		lambda:        lambda,
-		maxIterations: maxInterations}
-	population.fitness = make(map[*Individual]float64)
-	population.lastFitnessValidation = -1.0
+		ee:                    ee,
+		pop:                   pop,
+		mu:                    mu,
+		lambda:                lambda,
+		maxIterations:         maxInterations,
+		fitness:               make(map[*Individual]float64),
+		lastFitnessValidation: -1.0,
+	}
 
 	return population
 }

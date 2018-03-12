@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	experiment := experiments.NewExperiment(time.Now().UnixNano(), 10, 1, 1, 100000, "datasets/star.txt")
+	experiment := experiments.NewExperiment(time.Now().UnixNano(), 10, 1, 1, 100000, "datasets/sp.txt")
 	results, _ := experiment.Run()
 
 	for _, fitValues := range results {

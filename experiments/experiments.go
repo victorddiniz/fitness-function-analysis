@@ -1,6 +1,7 @@
 package experiments
 
 import (
+	"fmt"
 	"math/rand"
 
 	"github.com/victorddiniz/fitness-function-analysis/es"
@@ -31,7 +32,11 @@ func (e *Experiment) Run() ([][]float64, [][]float64) {
 		bestValidation := 0.0
 
 		for j := 0; j < e.numTests; j++ {
-			population := es.NewPopulation(e.mu, e.lambda, e.maxIteractions, e.datasetPath, e.rand, fitFunc)
+			ee, err := es.NewEvolutionExporter(fmt.Sprintf("evolution-%d.csv", j))
+			if err != nil {
+				panic(err)
+			}
+			population := es.NewPopulation(e.mu, e.lambda, e.maxIteractions, e.datasetPath, e.rand, fitFunc, ee)
 			ioHandler := iohandlers.GetInstance()
 
 			indRun, _, _ := population.Run()
@@ -63,13 +68,13 @@ func NewExperiment(randSeed int64, numTests, mu, lambda, maxIteractions int, dat
 
 	fitFunctions := []func(t, o []float64) float64{
 		functions.F1,
-		functions.F2,
+		/*functions.F2,
 		functions.F3,
 		functions.F4,
 		functions.F5,
 		functions.F6,
 		functions.F7,
-		functions.F8,
+		functions.F8,*/
 	}
 
 	errorMeasures := []func(t, o []float64) float64{
