@@ -63,18 +63,18 @@ func (population *Population) hasReachedLimit() bool {
 	bestInd := population.pop[0]
 	ioHandler := iohandlers.GetInstance()
 	in, out := ioHandler.GetKLagValidationSet(bestInd.GetLag())
-	fitnessValidation := bestInd.Fitness(in, out)
-	rateDeacrease := fitnessValidation / population.lastFitnessValidation
+	//fitnessValidation := bestInd.Fitness(in, out)
+	//rateDeacrease := fitnessValidation / population.lastFitnessValidation
 
 	hasReachedEnd := population.iteration > population.maxIterations ||
-		(population.iteration > 1 && rateDeacrease <= 0.99)
+		false //(population.iteration > 1 && rateDeacrease <= 0.99)
 
-	population.lastFitnessValidation = fitnessValidation
+	//population.lastFitnessValidation = fitnessValidation
 
 	if population.iteration%20 == 0 || population.iteration == 1 {
 		target := out
 		observations := bestInd.Predict(in)
-		population.ee.WriteEvolution(target, observations, fitnessValidation)
+		population.ee.WriteEvolution(target, observations, population.fitness[bestInd])
 	}
 
 	return hasReachedEnd
