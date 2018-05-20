@@ -67,14 +67,14 @@ func NewExperiment(randSeed int64, numTests, mu, lambda, maxIteractions int, dat
 	rand := rand.New(rand.NewSource(randSeed))
 
 	fitFunctions := []func(t, o []float64) float64{
-		//functions.F1,
-		//functions.F2,
+		functions.F1,
+		functions.F2,
 		functions.F3,
-		/*functions.F4,
+		functions.F4,
 		functions.F5,
 		functions.F6,
 		functions.F7,
-		functions.F8,*/
+		functions.F8,
 	}
 
 	errorMeasures := []func(t, o []float64) float64{
