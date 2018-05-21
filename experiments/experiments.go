@@ -2,6 +2,7 @@ package experiments
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 
 	"github.com/victorddiniz/fitness-function-analysis/es"
@@ -27,7 +28,8 @@ func (e *Experiment) Run() ([][]float64, [][]float64) {
 	predictions := make([][]float64, len(e.fitFunctions))
 
 	for i, fitFunc := range e.fitFunctions {
-		results[i] = make([]float64, len(e.errorMeasures))
+		results[i] = make([]float64, len(e.errorMeasures)+2)
+		fitValues := make([]float64, e.numTests)
 		var bestInd *es.Individual
 		bestValidation := 0.0
 
@@ -42,12 +44,27 @@ func (e *Experiment) Run() ([][]float64, [][]float64) {
 			indRun, _, _ := population.Run()
 			in, out := ioHandler.GetKLagValidationSet(indRun.GetLag())
 			value := indRun.Fitness(in, out)
+			fitValues[j] = value
 
 			if bestInd == nil || value > bestValidation {
 				bestInd = indRun
 				bestValidation = value
 			}
 		}
+
+		//calculate mean and std
+		sumFit := 0.0
+		for _, value := range fitValues {
+			sumFit += value
+		}
+		meanFit := sumFit / float64(e.numTests)
+		sumDiffSquared := 0.0
+		for _, value := range fitValues {
+			sumDiffSquared += (value - meanFit) * (value - meanFit)
+		}
+		stdFit := math.Sqrt(sumDiffSquared / float64(e.numTests))
+		results[i][len(e.errorMeasures)+1] = stdFit
+		results[i][len(e.errorMeasures)] = meanFit
 
 		ioHandler := iohandlers.GetInstance()
 		in, target := ioHandler.GetKLagTestSet(bestInd.GetLag())
